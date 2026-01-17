@@ -690,19 +690,6 @@ footer svg {
   border-radius: var(--radius-lg);
   border: 3px dashed var(--accent-color);
   box-shadow: var(--shadow-lg);
-  animation: dropOverlayPulse 2s infinite;
-}
-
-@keyframes dropOverlayPulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.02);
-  }
 }
 
 .drop-overlay-icon {
@@ -715,7 +702,6 @@ footer svg {
   background: var(--accent-light);
   border-radius: 50%;
   color: var(--accent-color);
-  animation: dropIconBounce 1s infinite;
 }
 
 @keyframes dropIconBounce {

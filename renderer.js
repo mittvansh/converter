@@ -146,8 +146,10 @@ function handleFiles(filePaths, forceReplace) {
     resultSection.style.display = 'none';
     errorSection.style.display = 'none';
     progressSection.style.display = 'none';
+    convertSection.style.display = 'none';
     currentFiles = [];
     isMultiMode = false;
+    convertBtn.disabled = false;
   }
 
   // Get existing file paths to avoid duplicates
@@ -585,23 +587,40 @@ cancelPasswordBtn.addEventListener('click', function () {
 
 // Full-app drag and drop
 var dragCounter = 0;
+var dragDebounceTimer = null;
 
 function hideDropOverlay() {
   dragCounter = 0;
+  if (dragDebounceTimer) {
+    clearTimeout(dragDebounceTimer);
+    dragDebounceTimer = null;
+  }
   fullDropOverlay.classList.remove('active');
 }
 
 function showDropOverlay() {
+  if (dragDebounceTimer) {
+    clearTimeout(dragDebounceTimer);
+  }
   fullDropOverlay.classList.add('active');
+}
+
+function scheduleHideOverlay() {
+  if (dragDebounceTimer) {
+    clearTimeout(dragDebounceTimer);
+  }
+  dragDebounceTimer = setTimeout(function () {
+    if (dragCounter <= 0) {
+      fullDropOverlay.classList.remove('active');
+    }
+  }, 50);
 }
 
 document.body.addEventListener('dragenter', function (e) {
   e.preventDefault();
   e.stopPropagation();
   dragCounter++;
-  if (dragCounter === 1) {
-    showDropOverlay();
-  }
+  showDropOverlay();
 });
 
 document.body.addEventListener('dragleave', function (e) {
@@ -609,7 +628,7 @@ document.body.addEventListener('dragleave', function (e) {
   e.stopPropagation();
   dragCounter--;
   if (dragCounter <= 0) {
-    hideDropOverlay();
+    scheduleHideOverlay();
   }
 });
 
@@ -646,7 +665,6 @@ fullDropOverlay.addEventListener('dragover', function (e) {
 fullDropOverlay.addEventListener('dragleave', function (e) {
   e.preventDefault();
   e.stopPropagation();
-  // Don't decrement counter here - let body handle it
 });
 
 fullDropOverlay.addEventListener('drop', function (e) {
