@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>File Converter</h1>
+      <p class="subtitle">Convert files locally, securely, and efficiently</p>
+    </header>
+
+    <div class="main-content">
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <p>Drag and drop your file here</p>
+        <p class="or">or</p>
+        <button id="selectFileBtn" class="btn-primary">Select File</button>
+      </div>
+
+      <div class="file-info" id="fileInfo" style="display: none;">
+        <div class="file-details">
+          <span class="file-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </span>
+          <div class="file-text">
+            <p class="file-name" id="fileName"></p>
+            <p class="file-size" id="fileSize"></p>
+          </div>
+        </div>
+        <button id="changeFileBtn" class="btn-secondary">Change</button>
+      </div>
+
+      <div class="conversion-section" id="conversionSection" style="display: none;">
+        <label class="label">Convert to</label>
+        <div class="select-wrapper">
+          <select id="outputFormat" class="select-input">
+            <option value="">Select format...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="output-section" id="outputSection" style="display: none;">
+        <label class="label">Output directory</label>
+        <div class="output-path">
+          <p id="outputPath">Same as source</p>
+          <button id="changeDirBtn" class="btn-secondary">Change</button>
+        </div>
+      </div>
+
+      <div class="convert-section" id="convertSection" style="display: none;">
+        <button id="convertBtn" class="btn-convert">Convert</button>
+      </div>
+
+      <div class="progress-section" id="progressSection" style="display: none;">
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p class="progress-text" id="progressText">Converting...</p>
+      </div>
+
+      <div class="result-section" id="resultSection" style="display: none;">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <p class="success-message" id="successMessage">Conversion complete!</p>
+        <button id="openFolderBtn" class="btn-secondary">Open Folder</button>
+        <button id="resetBtn" class="btn-primary">Convert Another</button>
+      </div>
+
+      <div class="error-section" id="errorSection" style="display: none;">
+        <div class="error-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </div>
+        <p class="error-message" id="errorMessage">An error occurred</p>
+        <button id="retryBtn" class="btn-primary">Try Again</button>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        All conversions happen locally on your device
+      </p>
+    </footer>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
