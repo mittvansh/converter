@@ -43,6 +43,14 @@ ipcMain.handle('select-file', async () => {
   return result;
 });
 
+ipcMain.handle('select-files', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile', 'multiSelections'],
+    filters: []
+  });
+  return result;
+});
+
 ipcMain.handle('select-output-directory', async () => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory']

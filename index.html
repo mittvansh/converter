@@ -12,6 +12,21 @@
 </head>
 
 <body>
+  <!-- Full-app drop overlay -->
+  <div id="fullDropOverlay" class="full-drop-overlay">
+    <div class="drop-overlay-content">
+      <div class="drop-overlay-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+      </div>
+      <p class="drop-overlay-text">Drop files here</p>
+      <p class="drop-overlay-subtext">Images, videos, documents, and more</p>
+    </div>
+  </div>
+
   <div class="container">
     <header>
       <h1>File Converter</h1>
@@ -27,11 +42,13 @@
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
         </div>
-        <p>Drag and drop your file here</p>
+        <p>Drag and drop your files here</p>
         <p class="or">or</p>
-        <button id="selectFileBtn" class="btn-primary">Select File</button>
+        <button id="selectFileBtn" class="btn-primary">Select Files</button>
+        <p class="multi-hint">Supports multiple files at once</p>
       </div>
 
+      <!-- Single File Info -->
       <div class="file-info" id="fileInfo" style="display: none;">
         <div class="file-details">
           <span class="file-icon">
@@ -48,12 +65,58 @@
         <button id="changeFileBtn" class="btn-secondary">Change</button>
       </div>
 
+      <!-- Multi File List -->
+      <div class="multi-file-section" id="multiFileSection" style="display: none;">
+        <div class="multi-file-header">
+          <span class="multi-file-count" id="multiFileCount">0 files selected</span>
+          <button id="addMoreFilesBtn" class="btn-secondary btn-small">Add More</button>
+          <button id="clearFilesBtn" class="btn-secondary btn-small">Clear All</button>
+        </div>
+        <div class="file-list" id="fileList"></div>
+      </div>
+
       <div class="conversion-section" id="conversionSection" style="display: none;">
         <label class="label">Convert to</label>
         <div class="select-wrapper">
           <select id="outputFormat" class="select-input">
             <option value="">Select format...</option>
           </select>
+        </div>
+      </div>
+
+      <!-- Multi-type format selection -->
+      <div class="multi-format-section" id="multiFormatSection" style="display: none;">
+        <div class="format-group" id="imageFormatGroup" style="display: none;">
+          <label class="label">Convert images to</label>
+          <div class="select-wrapper">
+            <select id="imageOutputFormat" class="select-input">
+              <option value="">Select format...</option>
+            </select>
+          </div>
+        </div>
+        <div class="format-group" id="videoFormatGroup" style="display: none;">
+          <label class="label">Convert videos to</label>
+          <div class="select-wrapper">
+            <select id="videoOutputFormat" class="select-input">
+              <option value="">Select format...</option>
+            </select>
+          </div>
+        </div>
+        <div class="format-group" id="audioFormatGroup" style="display: none;">
+          <label class="label">Convert audio to</label>
+          <div class="select-wrapper">
+            <select id="audioOutputFormat" class="select-input">
+              <option value="">Select format...</option>
+            </select>
+          </div>
+        </div>
+        <div class="format-group" id="documentFormatGroup" style="display: none;">
+          <label class="label">Convert documents to</label>
+          <div class="select-wrapper">
+            <select id="documentOutputFormat" class="select-input">
+              <option value="">Select format...</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -83,8 +146,10 @@
           </svg>
         </div>
         <p class="success-message" id="successMessage">Conversion complete!</p>
-        <button id="openFolderBtn" class="btn-secondary">Open Folder</button>
-        <button id="resetBtn" class="btn-primary">Convert Another</button>
+        <div class="result-buttons">
+          <button id="openFolderBtn" class="btn-secondary">Open Folder</button>
+          <button id="resetBtn" class="btn-primary">Convert More</button>
+        </div>
       </div>
 
       <div class="error-section" id="errorSection" style="display: none;">

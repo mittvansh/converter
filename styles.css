@@ -7,13 +7,13 @@
   --text-main: #1a1a1a;
   --text-secondary: #6b6b6b;
   --text-muted: #9a9a9a;
-  
+
   /* Accent - Claude's Terracotta */
   --accent-color: #d97757;
   --accent-hover: #c66a4a;
   --accent-light: rgba(217, 119, 87, 0.1);
   --accent-glow: rgba(217, 119, 87, 0.15);
-  
+
   /* UI Elements */
   --border-color: #e8e6e1;
   --border-focus: #d97757;
@@ -21,21 +21,21 @@
   --success-bg: #e8f5e9;
   --error-color: #c62828;
   --error-bg: #ffebee;
-  
+
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  
+
   /* Layout */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  
+
   /* Shadows - Subtle and warm */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03);
   --shadow-accent: 0 4px 16px rgba(217, 119, 87, 0.2);
-  
+
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -71,13 +71,14 @@ body {
 }
 
 @keyframes containerFadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(8px); 
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -274,13 +275,14 @@ button:focus-visible {
 }
 
 @keyframes slideUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(8px); 
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -433,23 +435,26 @@ button:focus-visible {
   left: 0;
   bottom: 0;
   right: 0;
-  background-image: linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.2) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.2) 75%,
-    transparent 75%,
-    transparent
-  );
+  background-image: linear-gradient(45deg,
+      rgba(255, 255, 255, 0.2) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.2) 75%,
+      transparent 75%,
+      transparent);
   background-size: 16px 16px;
   animation: moveStripes 0.8s linear infinite;
 }
 
 @keyframes moveStripes {
-  0% { background-position: 0 0; }
-  100% { background-position: 16px 16px; }
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 16px 16px;
+  }
 }
 
 .progress-text {
@@ -459,18 +464,25 @@ button:focus-visible {
 }
 
 /* Result Section */
-.result-section, .error-section {
+.result-section,
+.error-section {
   text-align: center;
   padding: 24px 0;
   animation: fadeIn 0.4s var(--transition-smooth);
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
-.success-icon, .error-icon {
+.success-icon,
+.error-icon {
   width: 64px;
   height: 64px;
   margin: 0 auto 20px;
@@ -482,8 +494,15 @@ button:focus-visible {
 }
 
 @keyframes popIn {
-  0% { transform: scale(0.5); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .success-icon {
@@ -512,7 +531,8 @@ button:focus-visible {
   fill: none;
 }
 
-.success-message, .error-message {
+.success-message,
+.error-message {
   font-size: 0.95rem;
   color: var(--text-main);
   margin-bottom: 24px;
@@ -553,19 +573,20 @@ footer svg {
   .container {
     padding: 20px;
   }
-  
+
   .main-content {
     padding: 24px;
   }
-  
+
   h1 {
     font-size: 1.5rem;
   }
-  
+
   .drop-zone {
     padding: 36px 20px;
   }
 }
+
 /* Modal Styles */
 .modal {
   position: fixed;
@@ -610,7 +631,302 @@ footer svg {
   gap: 1rem;
   justify-content: center;
 }
-.modal-buttons { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; } 
- .modal-buttons button { padding: 10px 20px; border-radius: 6px; cursor: pointer; border: none; font-weight: 500; } 
- .modal-buttons .primary-btn { background-color: var(--accent-color); color: white; } 
- .modal-buttons .secondary-btn { background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.modal-buttons button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+}
+
+.modal-buttons .primary-btn {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.modal-buttons .secondary-btn {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+/* Full-app Drop Overlay */
+.full-drop-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(217, 119, 87, 0.15);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-smooth), visibility var(--transition-smooth);
+  pointer-events: none;
+}
+
+.full-drop-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.drop-overlay-content {
+  text-align: center;
+  padding: 48px 64px;
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  border: 3px dashed var(--accent-color);
+  box-shadow: var(--shadow-lg);
+  animation: dropOverlayPulse 2s infinite;
+}
+
+@keyframes dropOverlayPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.drop-overlay-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-light);
+  border-radius: 50%;
+  color: var(--accent-color);
+  animation: dropIconBounce 1s infinite;
+}
+
+@keyframes dropIconBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.drop-overlay-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.drop-overlay-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.drop-overlay-subtext {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Multi-hint text in drop zone */
+.multi-hint {
+  margin-top: 16px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Multi-file Section */
+.multi-file-section {
+  animation: slideUp 0.3s var(--transition-smooth);
+}
+
+.multi-file-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.multi-file-count {
+  font-weight: 600;
+  color: var(--text-main);
+  flex: 1;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+}
+
+/* File List */
+.file-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+}
+
+.file-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.file-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.file-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.file-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.file-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color var(--transition-fast);
+}
+
+.file-list-item:last-child {
+  border-bottom: none;
+}
+
+.file-list-item:hover {
+  background-color: var(--surface-color);
+}
+
+.file-list-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.file-list-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-light);
+  border-radius: var(--radius-sm);
+  color: var(--accent-color);
+  flex-shrink: 0;
+}
+
+.file-list-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.file-list-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-list-name {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-list-meta {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.file-list-remove {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.file-list-remove:hover {
+  background: var(--error-bg);
+  color: var(--error-color);
+}
+
+/* Multi-format Section */
+.multi-format-section {
+  animation: slideUp 0.3s var(--transition-smooth);
+}
+
+.format-group {
+  margin-bottom: 16px;
+}
+
+.format-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Result buttons container */
+.result-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Improve select for grouped options */
+.select-input optgroup {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.select-input option {
+  font-weight: 400;
+  color: var(--text-main);
+  padding: 8px;
+}
