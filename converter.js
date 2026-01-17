@@ -5,18 +5,17 @@ var mammoth = require('mammoth');
 var fs = require('fs');
 var path = require('path');
 var os = require('os');
-var pdfParseImport = require('pdf-parse');
-// pdf-parse exports an object with PDFParse as the main function
-var pdfParseLib = pdfParseImport.PDFParse || pdfParseImport;
+var pdfParseLib = require('pdf-parse');
 var docxLib = require('docx');
 var Document = docxLib.Document;
 var Packer = docxLib.Packer;
 var Paragraph = docxLib.Paragraph;
 var TextRun = docxLib.TextRun;
-var archiver = require('archiver');
-var AdmZip = require('adm-zip');
 var PDFDocumentWriter = require('pdfkit');
 var EPub = require('epub2').default;
+var archiveHandler = require('./archive-handler');
+var Tesseract = require('tesseract.js');
+var pdfToPng = require('pdf-to-png-converter').pdfToPng;
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -66,7 +65,9 @@ async function convertFile(file, targetFormat, outputDir) {
     return convertDocument(inputPath, outputFilePath, inputExtension, targetExt);
   }
   if (inputType === 'archive') {
-    return convertArchive(inputPath, outputFilePath, targetExt);
+    // Password might be passed as an optional 4th argument to convertFile
+    var password = arguments[3];
+    return convertArchive(inputPath, outputFilePath, targetExt, password);
   }
 
   // Fallback
@@ -222,15 +223,101 @@ async function convertDocument(inputPath, outputPath, inputExt, targetExt) {
   throw new Error('Conversion from ' + inputExt.toUpperCase() + ' to ' + targetExt.toUpperCase() + ' is not supported');
 }
 
-// Helper function to parse PDF
+// Helper function to parse PDF with OCR fallback for scanned documents
+// Helper function to parse PDF with OCR fallback for scanned documents
 async function parsePdf(inputPath) {
-  if (typeof pdfParseLib !== 'function') {
-    throw new Error('pdf-parse library not loaded correctly. Type: ' + typeof pdfParseLib);
+  // First, try regular text extraction
+  try {
+    if (typeof pdfParseLib === 'function') {
+      var dataBuffer = fs.readFileSync(inputPath);
+      var data = await pdfParseLib(dataBuffer);
+      var text = data.text || '';
+
+      var pageCount = data.numpages || 1;
+      var cleanText = text.trim();
+      var avgCharsPerPage = cleanText.length / pageCount;
+
+      // Heuristic 1: Very sparse text (likely just page numbers or headers)
+      if (avgCharsPerPage < 100) {
+        console.log('Low text density detected (' + Math.round(avgCharsPerPage) + ' chars/page), falling back to OCR.');
+        return await ocrPdf(inputPath);
+      }
+
+      // Heuristic 2: Repetitive content detection (e.g. headers repeated on every page)
+      var lines = cleanText.split(/\n+/);
+      var headerLines = lines.filter(l => l.includes('Case') && l.includes('PageID') && l.includes('Filed'));
+
+      if (headerLines.length > 0 && (headerLines.length / lines.length) > 0.3) {
+        console.log('Repetitive header pattern detected, falling back to OCR to capture body text.');
+        return await ocrPdf(inputPath);
+      }
+
+      return text;
+    }
+  } catch (e) {
+    console.error('Regular PDF extraction failed:', e);
   }
-  var dataBuffer = fs.readFileSync(inputPath);
-  var data = await pdfParseLib(dataBuffer);
-  return data.text;
+
+  // Fall back to OCR for scanned documents
+  return await ocrPdf(inputPath);
 }
+
+// OCR a PDF by converting pages to images and running Tesseract
+async function ocrPdf(inputPath) {
+  console.log('Starting OCR for:', inputPath);
+
+  try {
+    // Convert PDF pages to PNG images
+    console.log('Converting PDF pages to images...');
+    var pngPages = await pdfToPng(inputPath, {
+      viewportScale: 2.0, // Reduced from 3.0 for faster processing
+      disableFontFace: true,
+      useSystemFonts: false
+    });
+    console.log('Converted', pngPages.length, 'pages to images.');
+
+    var fullText = '';
+
+    // Process each page
+    for (var i = 0; i < pngPages.length; i++) {
+      var page = pngPages[i];
+      console.log('OCR processing page', i + 1, 'of', pngPages.length, '...');
+
+      // Run Tesseract OCR on the page image with timeout
+      var result = await Promise.race([
+        Tesseract.recognize(
+          page.content, // PNG buffer
+          'eng', // Language
+          {
+            logger: function (m) {
+              // Log progress for first page to track initialization
+              if (i === 0 && m.status) {
+                console.log('Tesseract:', m.status, m.progress ? Math.round(m.progress * 100) + '%' : '');
+              }
+            }
+          }
+        ),
+        new Promise(function (_, reject) {
+          setTimeout(function () { reject(new Error('OCR timeout on page ' + (i + 1))); }, 120000); // 2 min per page max
+        })
+      ]);
+
+      fullText += result.data.text;
+      console.log('Page', i + 1, 'complete.');
+
+      if (i < pngPages.length - 1) {
+        fullText += '\n\n--- Page ' + (i + 2) + ' ---\n\n';
+      }
+    }
+
+    console.log('OCR complete. Total text length:', fullText.length);
+    return fullText.trim();
+  } catch (error) {
+    console.error('OCR error:', error);
+    throw new Error('OCR failed: ' + error.message);
+  }
+}
+
 
 async function pdfToTxt(inputPath, outputPath) {
   try {
@@ -490,58 +577,21 @@ async function createDocxFromText(textContent, outputPath) {
   return outputPath;
 }
 
-async function convertArchive(inputPath, outputPath, targetFormat) {
-  var inputExtension = path.extname(inputPath).toLowerCase().replace('.', '');
-  var tempDir = createTempDir();
+async function convertArchive(inputPath, outputPath, targetFormat, password) {
+  // If targetFormat is "extract" or matches the input, we extract.
+  // Actually, the UI usually selects a target format. For archives, the "target" is usually "folder" or "extracted".
+  // The existing logical flow in main.js calls convertFile(..., outputDir).
+  // If we are "converting" an archive, we are essentially extracting it.
 
-  try {
-    if (inputExtension === 'zip') {
-      var zip = new AdmZip(inputPath);
-      zip.extractAllTo(tempDir, true);
-    } else {
-      throw new Error('Archive format ' + inputExtension + ' is not supported');
-    }
+  // Note: outputPath passed from `convertFile` is `path.join(outDir, baseName + '.' + targetFormat)`.
+  // But for extraction we want a directory.
+  // We should ignore the constructed outputPath's extension if it's acting weird, 
+  // OR we rely on `archiveHandler.extract` to do the smart folder thing inside the `outDir`.
 
-    if (targetFormat === 'tar') {
-      await dirToTar(tempDir, outputPath);
-    } else if (targetFormat === 'zip') {
-      await dirToZip(tempDir, outputPath);
-    } else {
-      throw new Error('Target archive format ' + targetFormat + ' is not supported');
-    }
+  // Let's get the real base output directory from the `outputPath` (which might have a dummy extension).
+  var baseOutDir = path.dirname(outputPath);
 
-    return outputPath;
-  } finally {
-    cleanupTempDir(tempDir);
-  }
-}
-
-async function dirToTar(sourceDir, outputPath) {
-  return new Promise(function (resolve, reject) {
-    var output = fs.createWriteStream(outputPath);
-    var archive = archiver('tar', { gzip: false });
-
-    output.on('close', function () { resolve(outputPath); });
-    archive.on('error', function (err) { reject(err); });
-
-    archive.pipe(output);
-    archive.directory(sourceDir, false);
-    archive.finalize();
-  });
-}
-
-async function dirToZip(sourceDir, outputPath) {
-  return new Promise(function (resolve, reject) {
-    var output = fs.createWriteStream(outputPath);
-    var archive = archiver('zip', { zlib: { level: 9 } });
-
-    output.on('close', function () { resolve(outputPath); });
-    archive.on('error', function (err) { reject(err); });
-
-    archive.pipe(output);
-    archive.directory(sourceDir, false);
-    archive.finalize();
-  });
+  return archiveHandler.extract(inputPath, baseOutDir, password);
 }
 
 module.exports = {

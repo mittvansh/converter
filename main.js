@@ -62,10 +62,11 @@ ipcMain.handle('get-file-info', async (event, filePath) => {
   };
 });
 
-ipcMain.handle('convert-file', async (event, inputPath, targetFormat, outputDir) => {
+ipcMain.handle('convert-file', async (event, inputPath, targetFormat, outputDir, password) => {
   try {
     const { convertFile } = require('./converter');
-    return await convertFile({ path: inputPath }, targetFormat, outputDir);
+    // Using arguments array to pass potential password
+    return await convertFile({ path: inputPath }, targetFormat, outputDir, password);
   } catch (error) {
     throw new Error(`Conversion failed: ${error.message}`);
   }

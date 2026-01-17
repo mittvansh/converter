@@ -34,7 +34,7 @@ var supportedFormats = {
   ebook: ['epub'],
   audio: ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a', 'wma', 'aiff'],
   video: ['mp4', 'webm', 'avi', 'mov', 'mkv', 'flv', 'wmv', 'm4v', '3gp'],
-  archive: ['zip', 'tar']
+  archive: ['zip', 'tar', '7z', 'rar']
 };
 
 function getFileType(extension) {
@@ -77,7 +77,8 @@ function getAvailableFormats(fileType, currentExtension) {
       options = supportedFormats.document.slice();
     }
   } else if (fileType === 'archive') {
-    options = supportedFormats.archive.slice();
+    // For archives, the "format" is essentially "Extract"
+    options = ['extract'];
   } else {
     options = supportedFormats.video.concat(supportedFormats.audio).concat(supportedFormats.image);
   }
@@ -119,7 +120,15 @@ function handleFile(filePath) {
 
     var availableFormats = getAvailableFormats(fileType, extension);
 
-    outputFormat.innerHTML = '<option value="">Select format...</option>';
+    outputFormat.innerHTML = ''; // Clear previous options
+
+    // Default select text
+    if (fileType !== 'archive') {
+      var defaultOpt = document.createElement('option');
+      defaultOpt.value = "";
+      defaultOpt.textContent = "Select format...";
+      outputFormat.appendChild(defaultOpt);
+    }
 
     if (fileType === 'video') {
       var videoFormats = [];
@@ -157,6 +166,12 @@ function handleFile(filePath) {
         }
         outputFormat.appendChild(audioGroup);
       }
+    } else if (fileType === 'archive') {
+      var opt = document.createElement('option');
+      opt.value = 'extract';
+      opt.textContent = 'Extract Content';
+      opt.selected = true;
+      outputFormat.appendChild(opt);
     } else {
       for (var m = 0; m < availableFormats.length; m++) {
         var option = document.createElement('option');
@@ -170,6 +185,12 @@ function handleFile(filePath) {
       conversionSection.style.display = 'block';
       outputSection.style.display = 'block';
       convertSection.style.display = 'block';
+
+      if (fileType === 'archive') {
+        convertBtn.textContent = 'Extract Archive';
+      } else {
+        convertBtn.textContent = 'Convert File';
+      }
     } else {
       showError('This file type is not supported for conversion');
     }
@@ -182,7 +203,7 @@ function showProgress() {
   convertSection.style.display = 'none';
   progressSection.style.display = 'block';
   progressBar.style.width = '0%';
-  progressText.textContent = 'Converting... 0%';
+  progressText.textContent = 'Processing... 0%';
 }
 
 function updateProgress(percent) {
@@ -190,7 +211,7 @@ function updateProgress(percent) {
   if (percent >= 100) {
     progressText.textContent = 'Finalizing...';
   } else {
-    progressText.textContent = 'Converting... ' + Math.round(percent) + '%';
+    progressText.textContent = 'Processing... ' + Math.round(percent) + '%';
   }
 }
 
@@ -201,7 +222,7 @@ function showResult(outputFilePath) {
 
   var parts = outputFilePath.split(/[/\\]/);
   var fName = parts[parts.length - 1];
-  successMessage.textContent = 'Successfully converted to ' + fName;
+  successMessage.textContent = 'Successfully saved to ' + fName;
 }
 
 function showError(message) {
@@ -227,11 +248,44 @@ function resetUI() {
   progressSection.style.display = 'none';
   resultSection.style.display = 'none';
   errorSection.style.display = 'none';
+  convertBtn.textContent = 'Convert File';
 
   outputFormat.innerHTML = '<option value="">Select format...</option>';
   outputPath.textContent = 'Same as source';
   convertBtn.disabled = false;
 }
+
+// Modal Logic
+var passwordModal = document.getElementById('passwordModal');
+var archivePasswordInput = document.getElementById('archivePassword');
+var submitPasswordBtn = document.getElementById('submitPasswordBtn');
+var cancelPasswordBtn = document.getElementById('cancelPasswordBtn');
+
+function showPasswordModal() {
+  passwordModal.style.display = 'flex';
+  archivePasswordInput.value = '';
+  archivePasswordInput.focus();
+}
+
+function hidePasswordModal() {
+  passwordModal.style.display = 'none';
+  archivePasswordInput.value = '';
+}
+
+submitPasswordBtn.addEventListener('click', function () {
+  var password = archivePasswordInput.value;
+  if (!password) return;
+
+  hidePasswordModal();
+  startConversion(password);
+});
+
+cancelPasswordBtn.addEventListener('click', function () {
+  hidePasswordModal();
+  convertBtn.disabled = false;
+  progressSection.style.display = 'none';
+  convertSection.style.display = 'block';
+});
 
 // Event Listeners
 dropZone.addEventListener('click', function () {
@@ -283,11 +337,12 @@ dropZone.addEventListener('drop', function (e) {
 
   if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
     var file = e.dataTransfer.files[0];
-    handleFile(file.path);
+    var path = window.electron.getFilePath(file);
+    handleFile(path);
   }
 });
 
-convertBtn.addEventListener('click', function () {
+function startConversion(password) {
   var targetFormat = outputFormat.value;
   if (!targetFormat) {
     showError('Please select a target format');
@@ -314,7 +369,7 @@ convertBtn.addEventListener('click', function () {
     updateProgress(Math.min(progress, 95));
   }, 100);
 
-  window.electron.convertFile(currentFilePath, targetFormat, outputDirectory)
+  window.electron.convertFile(currentFilePath, targetFormat, outputDirectory, password)
     .then(function (resultPath) {
       clearInterval(progressInterval);
       updateProgress(100);
@@ -322,8 +377,16 @@ convertBtn.addEventListener('click', function () {
     })
     .catch(function (error) {
       clearInterval(progressInterval);
-      showError(error.message);
+      if (error.message.includes('PASSWORD_REQUIRED')) {
+        showPasswordModal();
+      } else {
+        showError(error.message);
+      }
     });
+}
+
+convertBtn.addEventListener('click', function () {
+  startConversion(null);
 });
 
 openFolderBtn.addEventListener('click', function () {
